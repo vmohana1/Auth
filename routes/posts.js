@@ -28,7 +28,7 @@ router.get('/', function(req, res, next) {
   res.send('respond with a posts');
 });
 
-router.delete('/',  verifyAdmin, function(req, res, next) {
+router.delete('/', cors(corsOptions), verifyAdmin, function(req, res, next) {
   res.end('Deleted some of the posts');
 });
 

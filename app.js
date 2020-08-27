@@ -3,11 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var postsRouter = require('./routes/posts');
-
+const authRouter = require('./routes/auth');
+const commentRouter = require('./routes/comments');
 var app = express();
 
 // view engine setup
@@ -20,8 +22,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+app.use(cors(corsOptions));
 
 app.use('/', indexRouter);
+
+app.use('/login', authRouter);
 
 app.use((req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -36,6 +51,7 @@ app.use((req, res, next) => {
 //users and posts are available to access for all authorized people.
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
+app.use('/comments', commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
